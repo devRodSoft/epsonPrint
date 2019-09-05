@@ -1,4 +1,13 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+header("Allow: GET, POST, OPTIONS, PUT, DELETE");
+$method = $_SERVER['REQUEST_METHOD'];
+if($method == "OPTIONS") {
+    die();
+}
+
 /* Change to the correct path if you copy this example! */
 require  './vendor/autoload.php';
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
@@ -134,7 +143,12 @@ class Ticket  {
 
 //instance a new objetc
 $tikect = new Ticket();
-//Send the data to print for each tikeck
-$tikect->printTicket($_POST['pelicula'],$_POST['clasificacion'],$_POST['duracion'],$_POST['seat'],$_POST['idioma'],$_POST['fecha'],$_POST['boleto'],$_POST['codigo'],$_POST['sala'],$_POST['horario']);
-$tikect->printTicket($_POST['pelicula'],$_POST['clasificacion'],$_POST['duracion'],$_POST['seat'],$_POST['idioma'],$_POST['fecha'],$_POST['boleto'],$_POST['codigo'],$_POST['sala'],$_POST['horario']);
-$tikect->printTicket($_POST['pelicula'],$_POST['clasificacion'],$_POST['duracion'],$_POST['seat'],$_POST['idioma'],$_POST['fecha'],$_POST['boleto'],$_POST['codigo'],$_POST['sala'],$_POST['horario']);
+//Receive the RAW post data.
+$content = trim(file_get_contents("php://input"));
+ 
+//Attempt to decode the incoming RAW post data from JSON.
+$decoded = json_decode($content, true);
+
+foreach($decoded['seat'] as $value) {
+	$tikect->printTicket($decoded['pelicula'],$decoded['clasificacion'],$decoded['duracion'],$value,$decoded['idioma'],$decoded['fecha'],$decoded['boleto'],$decoded['codigo'],$decoded['sala'],$decoded['horario']);
+}
