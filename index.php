@@ -6,25 +6,23 @@ use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 
 /**
- * Install the printer using USB printing support, and the "Generic / Text Only" driver,
- * then share it (you can use a firewall so that it can only be seen locally).
- *
- * Use a WindowsPrintConnector with the share name to print.
- *
- */
-
+* Install the printer using USB printing support, and the "Generic / Text Only" driver,
+* then share it (you can use a firewall so that it can only be seen locally).
+*
+* Use a WindowsPrintConnector with the share name to print.
+*
+* @property string $pelicula
+* @property string $clasificacion
+* @property string $duracion
+* @property string $seat
+* @property string $idioma
+* @property string $fecha
+* @property string $boleto
+* @property string $codigo
+* @property string $sala
+* @property string $horario
+*/
 class Ticket  {
-	//Tickets values
-	public $pelicula = "";
-	public $clasificacion = "";
-	public $duracion = "";
-	public $seat = "";
-	public $idioma = "";
-	public $fecha = "";
-	public $boleto = "";
-	public $codigo = "";
-	public $sala = "";
-	public $horario = "";
 	
 	static function printTicket ($pelicula,$clasificacion,$duracion,$seat,$idioma,$fecha,$boleto,$codigo,$sala,$hora) {
 
