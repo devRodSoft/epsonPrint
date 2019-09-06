@@ -33,7 +33,7 @@ use Mike42\Escpos\EscposImage;
 */
 class Ticket  {
 	
-	static function printTicket ($pelicula,$clasificacion,$duracion,$seat,$idioma,$fecha,$boleto,$codigo,$sala,$hora) {
+	static function printTicket ($pelicula,$clasificacion,$duracion,$seat,$idioma,$fecha,$codigo,$sala,$hora,$user,$typoBoleto,$precio) {
 
 		//Set the windows connector and connect to the printer, this have to be shared! 
 		$connector = new WindowsPrintConnector('cine-1');
@@ -49,63 +49,65 @@ class Ticket  {
 			$logo = EscposImage::load("logo.png", false);
 			$printer->bitImage($logo);
 		}   catch   (Exception $e)  {/*Logger here*/}
-
-
+	
 		/*
 			Print movie name
 		*/
-		$printer->setTextSize(1, 3);
+		$printer->text("". "\n");
+		$printer->text("". "\n");
+		$printer->setTextSize(3, 3);
 		$printer->setEmphasis(true);
 		$printer->text($pelicula. "\n");
-		$printer->setEmphasis(false);
-		$printer->setTextSize(1, 1);
-
-		/*
-			print Clasification, time and lenaguaje
-		*/ 
-		$printer->text("". "\n");
-		$printer->text($clasificacion . " |" . $duracion  . " | " . $idioma . "\n");
+		$printer->setEmphasis(false);		
 
 		/* 
 			print sala, time and seat
 		*/
 		$printer->setEmphasis(true);
 
-		$printer->text("". "\n");
-		$printer->setEmphasis(false);
-		$printer->setTextSize(1, 2);
-		$printer->text($sala. " | " . $hora  . " | " . $seat . "\n");
-		$printer->setEmphasis(true);
-		$printer->text("________________________________________________". "\n");
-		$printer->setEmphasis(false);
+		$printer->text("". "\n");		
+		$printer->setTextSize(2, 2);
+		$printer->text($sala. " | " . $hora  .  "\n");
+		$printer->text("" . "\n");
+		$printer->text($seat . "\n");
 
+		$printer->setEmphasis(false);
+		/*
+			print Clasification, time and lenaguaje
+		*/ 
 
 		$printer->setTextSize(1, 1);
-		/*
-			print the movie date
-		*/ 
-		$printer->text("". "\n");
+		$printer->text("" . "\n");
+		$printer->text($clasificacion . " | " . $duracion  . " " .  "min" . " | " . $idioma . "\n");
 		$printer->text($fecha . "\n");
+
 		$printer->text("". "\n");
+		$printer->text("Vendedor: " . $user . " | " . $typoBoleto . " " . $precio . "\n");	
+		$printer->text("Codigo: " . $codigo . "\n");
+		$printer->text("". "\n");
+			
 
 		/*
 			Print separator
 		*/
-		$printer->text("------------------------------------------------". "\n");
+		$printer->setTextSize(2, 2);
+		$printer->setEmphasis(true);
+		$printer->text("------------------------". "\n");
+		$printer->setEmphasis(false);
+		$printer->setTextSize(1, 1);
 
 
 		/* 
 			print sala, time and seat to cut 
 		*/ 
 
-		$printer->setEmphasis(true);
+		
 		$printer->text("". "\n");
-		$printer->setEmphasis(false);
+		$printer->setTextSize(2, 1);
+		$printer->text($pelicula. "\n");
 		$printer->setTextSize(1, 2);
 		$printer->text($sala. " | " . $hora  . " | " . $seat . "\n");
-		$printer->setEmphasis(true);
-		$printer->text("________________________________________________". "\n");
-		$printer->setEmphasis(false);
+		
 
 		/*
 			print the movie date
@@ -114,6 +116,11 @@ class Ticket  {
 		$printer->setTextSize(1, 1);
 		$printer->text("". "\n");
 		$printer->text($fecha . "\n");
+		$printer->text("". "\n");
+		$printer->text("Vendedor: " . $user . " | " . $typoBoleto . " " . $precio . "\n");	
+		$printer->text("Codigo: " . $codigo . "\n");
+		$printer->text("". "\n");
+		
 
 
 		/*Alimentamos el papel 3 veces*/
@@ -149,6 +156,9 @@ $content = trim(file_get_contents("php://input"));
 //Attempt to decode the incoming RAW post data from JSON.
 $decoded = json_decode($content, true);
 
-foreach($decoded['seat'] as $value) {
-	$tikect->printTicket($decoded['pelicula'],$decoded['clasificacion'],$decoded['duracion'],$value,$decoded['idioma'],$decoded['fecha'],$decoded['boleto'],$decoded['codigo'],$decoded['sala'],$decoded['horario']);
+
+
+foreach($decoded['seat'] as $key=>$value) {
+	$codigo = $decoded['boleto'] . $value;
+	$tikect->printTicket($decoded['pelicula'],$decoded['clasificacion'],$decoded['duracion'],$value,$decoded['idioma'],$decoded['fecha'],$codigo,$decoded['sala'],$decoded['horario'], $decoded['user'], $decoded['precios'][$key]['nombre'], $decoded['precios'][$key]['precio']);
 }
