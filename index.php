@@ -31,9 +31,26 @@ use Mike42\Escpos\EscposImage;
 * @property string $sala
 * @property string $horario
 */
+date_default_timezone_set('america/mexico_city');
+
 class Ticket  {
+
+	public $pelicula;
+	public $clasificacion;
+	public $duracion;
+	public $seat;
+	public $idioma;
+	public $fecha;
+	public $codigo;
+	public $sala;
+	public $hora;
+	public $user;
+	public $typoBoleto;
+	public $precio; 
+	public $reImprecion;
+
 	
-	static function printTicket ($pelicula,$clasificacion,$duracion,$seat,$idioma,$fecha,$codigo,$sala,$hora,$user,$typoBoleto,$precio) {
+	public function printTicket () {
 
 		//Set the windows connector and connect to the printer, this have to be shared! 
 		$connector = new WindowsPrintConnector('cine-1');
@@ -57,7 +74,7 @@ class Ticket  {
 		$printer->text("". "\n");
 		$printer->setTextSize(3, 3);
 		$printer->setEmphasis(true);
-		$printer->text($pelicula. "\n");
+		$printer->text($this->pelicula. "\n");
 		$printer->setEmphasis(false);		
 
 		/* 
@@ -67,9 +84,9 @@ class Ticket  {
 
 		$printer->text("". "\n");		
 		$printer->setTextSize(2, 2);
-		$printer->text($sala. " | " . $hora  .  "\n");
+		$printer->text($this->sala. " | " . $this->horario  .  "\n");
 		$printer->text("" . "\n");
-		$printer->text($seat . "\n");
+		$printer->text($this->seat . "\n");
 
 		$printer->setEmphasis(false);
 		/*
@@ -78,12 +95,12 @@ class Ticket  {
 
 		$printer->setTextSize(1, 1);
 		$printer->text("" . "\n");
-		$printer->text($clasificacion . " | " . $duracion  . " " .  "min" . " | " . $idioma . "\n");
-		$printer->text($fecha . "\n");
+		$printer->text($this->clasificacion . " | " . $this->duracion  . " " .  "min" . " | " . $this->idioma . "\n");
+		$printer->text($this->fecha . "\n");
 
 		$printer->text("". "\n");
-		$printer->text("Vendedor: " . $user . " | " . $typoBoleto . " " . $precio . "\n");	
-		$printer->text("Codigo: " . $codigo . "\n");
+		$printer->text("Vendedor: " . $this->user . " | " . $this->typoBoleto . " " . $this->precio . "\n");	
+		$printer->text("Codigo: " . $this->codigo . "\n");
 		$printer->text("". "\n");
 			
 
@@ -95,34 +112,32 @@ class Ticket  {
 		$printer->text("------------------------". "\n");
 		$printer->setEmphasis(false);
 		$printer->setTextSize(1, 1);
-
-
 		/* 
 			print sala, time and seat to cut 
 		*/ 
 
-		
 		$printer->text("". "\n");
 		$printer->setTextSize(2, 1);
-		$printer->text($pelicula. "\n");
+		$printer->text($this->pelicula. "\n");
 		$printer->setTextSize(1, 2);
-		$printer->text($sala. " | " . $hora  . " | " . $seat . "\n");
+		$printer->text($this->sala. " | " . $this->horario  . " | " . $this->seat . "\n");
 		
-
 		/*
 			print the movie date
 		*/ 
-
 		$printer->setTextSize(1, 1);
 		$printer->text("". "\n");
-		$printer->text($fecha . "\n");
+		$printer->text($this->fecha . "\n");
 		$printer->text("". "\n");
-		$printer->text("Vendedor: " . $user . " | " . $typoBoleto . " " . $precio . "\n");	
-		$printer->text("Codigo: " . $codigo . "\n");
+		$printer->text("Vendedor: " . $this->user . " | " . $this->typoBoleto . " " . $this->precio . "\n");	
+		$printer->text("Codigo: " . $this->codigo . "\n");
 		$printer->text("". "\n");
+
+		if ($this->reImprecion) {
+			$printer->text("Boleto Reimpreso" ."\n");
+			$printer->text("". "\n");
+		}
 		
-
-
 		/*Alimentamos el papel 3 veces*/
 		$printer->feed(5);
 		
@@ -146,19 +161,61 @@ class Ticket  {
 		*/
 		$printer->close();
 	}
+
+	public function  getTicketData($seats) {
+
+		$this->pelicula 	 = $seats['pelicula'];
+		$this->clasificacion = $seats['clasificacion'];
+		$this->duracion      = $seats['duracion'];
+		$this->idioma        = $seats['idioma'];
+		$this->fecha         = $this->getFormatDate($seats['fecha']);
+		$this->sala          = $seats['sala'];
+		$this->horario       = $seats['horario'];
+		$this->user          = $seats['user'];
+		$this->reImprecion   = $seats['reImprecion'];
+
+		foreach ($seats['seat'] as $key => $value) {
+			
+			$this->seat   	   = $value;
+			$this->codigo      = $seats['boleto'] . $value;
+			$this->typoBoleto  = $seats['precios'][$key]['nombre'];
+			$this->precio      = $seats['precios'][$key]['precio'];
+
+			$this->printTicket();
+		}
+	}
+
+	static function getFormatDate($fecha) {
+
+		//when do re print ticket backend send us the corrrect format so we need to do some validation to parse or not
+		if (strlen($str) <= 10) {
+			$fecha = substr($fecha, 0, 10);
+			$numeroDia = date('d', strtotime($fecha));
+			$dia = date('l', strtotime($fecha));
+			$mes = date('F', strtotime($fecha));
+			$anio = date('Y', strtotime($fecha));
+			$dias_ES = array("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo");
+			$dias_EN = array("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");
+			$nombredia = str_replace($dias_EN, $dias_ES, $dia);
+			$meses_ES = array("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre");
+			$meses_EN = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
+			$nombreMes = str_replace($meses_EN, $meses_ES, $mes);
+
+			return $nombredia . " " . $numeroDia . " " . $nombreMes . " " . $anio;
+		}  else {
+			return $fecha;
+		}
+	}
 }
 
 //instance a new objetc
 $tikect = new Ticket();
+
 //Receive the RAW post data.
 $content = trim(file_get_contents("php://input"));
- 
+
 //Attempt to decode the incoming RAW post data from JSON.
 $decoded = json_decode($content, true);
 
-
-
-foreach($decoded['seat'] as $key=>$value) {
-	$codigo = $decoded['boleto'] . $value;
-	$tikect->printTicket($decoded['pelicula'],$decoded['clasificacion'],$decoded['duracion'],$value,$decoded['idioma'],$decoded['fecha'],$codigo,$decoded['sala'],$decoded['horario'], $decoded['user'], $decoded['precios'][$key]['nombre'], $decoded['precios'][$key]['precio']);
-}
+// Call the function to start the print process
+$tikect->getTicketData($decoded);
