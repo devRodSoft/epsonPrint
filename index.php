@@ -168,12 +168,12 @@ class Ticket  {
 		$this->clasificacion = $seats['clasificacion'];
 		$this->duracion      = $seats['duracion'];
 		$this->idioma        = $seats['idioma'];
-		$this->fecha         = $this->getFormatDate($seats['fecha']);
+		$this->reImprecion   = $seats['reImprecion'];
+		$this->fecha         = $this->getFormatDate($seats['fecha'],$seats['reImprecion']);
 		$this->sala          = $seats['sala'];
 		$this->horario       = $seats['horario'];
 		$this->user          = $seats['user'];
-		$this->reImprecion   = $seats['reImprecion'];
-
+		
 		foreach ($seats['seat'] as $key => $value) {
 			
 			$this->seat   	   = $value;
@@ -185,10 +185,10 @@ class Ticket  {
 		}
 	}
 
-	static function getFormatDate($fecha) {
+	static function getFormatDate($fecha, $rePrint) {
 
 		//when do re print ticket backend send us the corrrect format so we need to do some validation to parse or not
-		if (strlen($str) <= 10) {
+		if (!$rePrint) {
 			$fecha = substr($fecha, 0, 10);
 			$numeroDia = date('d', strtotime($fecha));
 			$dia = date('l', strtotime($fecha));
