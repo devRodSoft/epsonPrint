@@ -70,9 +70,8 @@ class Ticket  {
 		/*
 			Print movie name
 		*/
-		$printer->text("". "\n");
-		$printer->text("". "\n");
-		$printer->setTextSize(3, 3);
+		//$printer->text("". "\n");
+		$printer->setTextSize(2, 2);
 		$printer->setEmphasis(true);
 		$printer->text($this->pelicula. "\n");
 		$printer->setEmphasis(false);		
@@ -86,7 +85,8 @@ class Ticket  {
 		$printer->setTextSize(2, 2);
 		$printer->text($this->sala. " | " . $this->horario  .  "\n");
 		$printer->text("" . "\n");
-		$printer->text($this->seat . "\n");
+		//$printer->text($this->seat . "\n");
+		$printer->text($this->seat);
 
 		$printer->setEmphasis(false);
 		/*
@@ -98,10 +98,10 @@ class Ticket  {
 		$printer->text($this->clasificacion . " | " . $this->duracion  . " " .  "min" . " | " . $this->idioma . "\n");
 		$printer->text($this->fecha . "\n");
 
-		$printer->text("". "\n");
+		//$printer->text("". "\n");
 		$printer->text("Vendedor: " . $this->user . " | " . $this->typoBoleto . " " . $this->precio . "\n");	
 		$printer->text("Codigo: " . $this->codigo . "\n");
-		$printer->text("". "\n");
+		//$printer->text("". "\n");
 			
 
 		/*
@@ -128,18 +128,18 @@ class Ticket  {
 		$printer->setTextSize(1, 1);
 		$printer->text("". "\n");
 		$printer->text($this->fecha . "\n");
-		$printer->text("". "\n");
+		//$printer->text("". "\n");
 		$printer->text("Vendedor: " . $this->user . " | " . $this->typoBoleto . " " . $this->precio . "\n");	
 		$printer->text("Codigo: " . $this->codigo . "\n");
 		$printer->text("". "\n");
 
 		if ($this->reImprecion) {
 			$printer->text("Boleto Reimpreso" ."\n");
-			$printer->text("". "\n");
+			//$printer->text("". "\n");
 		}
 		
 		/*Alimentamos el papel 3 veces*/
-		$printer->feed(5);
+		//$printer->feed(5);
 		
 		/*
 			Cortamos el papel. Si nuestra impresora
