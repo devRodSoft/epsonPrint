@@ -33,7 +33,7 @@ class Ticket  {
 		try {
 			// Enter the share name for your USB printer here
 			$connector = null;
-			$connector = new WindowsPrintConnector("printer");
+			$connector = new WindowsPrintConnector("rodsoft");
 
 			$printer = new Printer($connector);
 
@@ -44,17 +44,25 @@ class Ticket  {
 				Try to load and print the logo image
 			*/
 			try{
-				$logo = EscposImage::load("logo.png", false);
+				$logo = EscposImage::load("./images/logo.png", false);
 				$printer->bitImage($logo);
 			}   catch   (Exception $e)  {/*Logger here*/}
 
-			$printer->feed(1);
-			$printer->setTextSize(1, 1);
-			$printer->text("MAFRA Boutique". "\n");			
-			$printer->text("Hernández #66 Arandas, Jal". "\n");
-			$printer->text("Tel: 3481953503". "\n");
+
+			$printer->feed(2);
 			$printer->text($this->getFormatDate(). "\n");
-			$printer->setTextSize(1, 1);
+			$printer->feed(2);
+
+			$printer->setJustification(Printer::JUSTIFY_LEFT);
+			$printer->setEmphasis(true);
+			$printer->text("Cliente: ");
+			$printer->setEmphasis(false);
+			$printer->text($data->name . "\n");
+			$printer->setEmphasis(true);
+			$printer->text("Telefono: ");
+			$printer->setEmphasis(false);
+			$printer->text($data->celphone . "\n");
+
 
 			/*
 			Print separator
@@ -63,58 +71,43 @@ class Ticket  {
 			$printer->setJustification(Printer::JUSTIFY_LEFT);
 			$printer->setTextSize(2, 2);
 			$printer->setEmphasis(true);
-			$printer->text("------------------------". "\n");
+			$printer->text("________________________". "\n");
 			$printer->setEmphasis(false);
 			$printer->setTextSize(1, 1);
 			$printer->feed(1);
 
-
-
-			if ($data['backendPrint']) {
-				foreach($data["productos"] as $producto) {
-					
-					$printer->setJustification(Printer::JUSTIFY_LEFT);
-					$printer->text($producto['selectedCantidad']);
-					$printer->text(" " . $producto['descripcion']);
-					$printer->text(" $ " . ( $producto['precio'] * $producto['selectedCantidad'] ) . "\n");
-
-				}
-			} else {
-				//try to print procducos
-				foreach($data['productos'] as $producto) {
-					$printer->setJustification(Printer::JUSTIFY_LEFT);
-					$printer->text($producto['selectedCantidad']);
-					$printer->text(" " . $producto['producto']['descripcion']);
-					//$printer->setJustification(Printer::JUSTIFY_RIGHT);	
-					
-					if ($data["precioSelected"] == "1") {
-						$printer->text(" $ " . ( $producto['producto']['precio'] * $producto['selectedCantidad'] ) . "\n");
-					} else  {
-						$printer->text(" $ " . ( $producto['producto']['precio1'] * $producto['selectedCantidad'] ) . "\n");
-					}
-				}
+			$printer -> setEmphasis(true);
+			$printer -> text(new item('', '$'));
+			$printer -> setEmphasis(false);
+			$printer->feed(1);
+			foreach($data->products as $producto) {
+				$printer -> text(new Item($producto->qty . " " . $producto->desc, $producto->price . ".00"));
 			}
 
-			$printer->feed(1);
+			/* Footer */
+			$printer->setJustification(Printer::JUSTIFY_LEFT);
 			$printer->setTextSize(2, 2);
 			$printer->setEmphasis(true);
-			$printer->text("------------------------". "\n");
+			$printer->text("________________________". "\n");
 			$printer->setEmphasis(false);
 			$printer->setTextSize(1, 1);
 			$printer->feed(1);
+			$printer -> setEmphasis(true);
+			$printer -> text(new item('', '$'));
+			$printer -> setEmphasis(false);
 			
-			//$printer->feed(5);
-			$printer->setJustification(Printer::JUSTIFY_RIGHT);
-			$printer->setEmphasis(false);
-			$printer->setTextSize(2, 1);
-			$printer->text("Descuento:  $" . $data['descuento']. " MXN\n");
-			$printer->text("Total: $" . $data['total']. " MXN \n");
-			
+			$printer -> setJustification(Printer::JUSTIFY_LEFT);
+			$printer -> text(new Item('Total', $data->total . ".00"));
+			//$printer->feed(1);
+			$printer -> text(new Item('Anticipo', $data->anticipo . ".00"));
+			//$printer->feed(1);
+			$printer -> text(new Item('Restante', $data->restante . ".00"));
+						
 			$printer->feed(2);
 			$printer->setJustification(Printer::JUSTIFY_CENTER);
 			$printer->setTextSize(1, 1);
-			//$printer->text("15 dias de garantia en defectos de fabrica.\n");
-			$printer->text("Gracia por su compra :D.\n");
+			$printer->text("INVITACIONES - IMPRESION DE PLANOS Y DOC. \n PUBLICIDAD - LONAS - DETALLES PERSONALIZADOS - Y MAS.\n");
+			
 			$printer->feed(2);
 
 			//$printer->feed(5);
@@ -146,15 +139,47 @@ class Ticket  {
 
 }
 
+
+class Item
+{
+    private $name;
+    private $price;
+    private $dollarSign;
+
+    public function __construct($name = '', $price = '', $dollarSign = false)
+    {
+        $this -> name = $name;
+        $this -> price = $price;
+        $this -> dollarSign = $dollarSign;
+    }
+
+    public function __toString()
+    {
+        $rightCols = 10;
+        $leftCols = 38;
+        if ($this -> dollarSign) {
+            $leftCols = $leftCols / 2 - $rightCols / 2;
+        }
+        $left = str_pad($this -> name, $leftCols) ;
+
+        $sign = ($this -> dollarSign ? '$ ' : '');
+        $right = str_pad($sign . $this -> price, $rightCols, ' ', STR_PAD_LEFT);
+        return "$left$right\n";
+    }
+}
+
 //instance a new objetc
 $tikect = new Ticket();
 
 //Receive the RAW post data.
 $content = trim(file_get_contents("php://input"));
-$data = [];
+$data;
 
 //Attempt to decode the incoming RAW post data from Array.
 parse_str($content, $data);
+
+$data = json_decode($content);
+
 
 
 // Call the function to start the print process
