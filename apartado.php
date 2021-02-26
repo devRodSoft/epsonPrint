@@ -30,6 +30,7 @@ class Ticket  {
 	
 	public function printTicket ($data) {
 
+		
 		try {
 			// Enter the share name for your USB printer here
 			$connector = null;
@@ -55,18 +56,38 @@ class Ticket  {
 			$printer->text("Tel: 3481246642". "\n");
 			$printer->text($this->getFormatDate(). "\n");
 			$printer->setTextSize(1, 1);
-			$printer->feed(2);
+			$printer->feed(1);
 
 			/*
 			Print separator
 			*/
 
+
+
 			$printer->setTextSize(2, 2);
 			$printer->setJustification(Printer::JUSTIFY_CENTER);
 			$printer->setEmphasis(true);
-			$printer->text('Venta' . "\n");
+			$printer->text('Apartado' . "\n");
 			$printer->setEmphasis(false);
 			$printer->setJustification(Printer::JUSTIFY_LEFT);
+			$printer->feed(1);
+
+			$printer->setTextSize(1, 1);
+			$printer->setJustification(Printer::JUSTIFY_LEFT);
+			$printer->setEmphasis(true);
+			$printer->text('Cliente' . "\n");
+			$printer->setEmphasis(false);
+			$printer->feed(1);
+
+			$printer->setEmphasis(true);
+			$printer->text("Codigo: ");
+			$printer->setEmphasis(false);
+			$printer->text($data['clienteId'] . "\n");
+
+			$printer->setEmphasis(true);
+			$printer->text("Nombre: ");
+			$printer->setEmphasis(false);
+			$printer->text(trim($data['cliente']) . "\n");
 			$printer->feed(1);
 
 			$printer->setTextSize(1, 1);
@@ -83,7 +104,7 @@ class Ticket  {
 				}
 			} else {
 				//try to print procducos
-				foreach($data['productos'] as $producto) {	
+				foreach($data['productos'] as $producto) {
 					if ($data["precioSelected"] == "1") {
 						$printer -> text(new Item($producto['selectedCantidad'] . " " . $producto['producto']['descripcion'], ( $producto['producto']['precio'] * $producto['selectedCantidad'] )  . ".00"));
 					} else  {
@@ -99,8 +120,9 @@ class Ticket  {
 			$printer->setEmphasis(false);
 			
 			$printer->setTextSize(2, 1);
-			$printer->text(new ItemCustom("Descuento",  "$ " . $data['descuento'] . ".00"));
 			$printer->text(new ItemCustom("Total",  "$ " . $data['total'] . ".00"));
+			$printer->text(new ItemCustom("Abono",  "$ " . $data['abono'] . ".00"));
+			$printer->text(new ItemCustom("Restante",  "$ " . ($data['total']  - $data['abono'] ) . ".00"));
 
 			
 			$printer->feed(2);
