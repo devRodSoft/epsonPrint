@@ -33,7 +33,7 @@ class Ticket  {
 		try {
 			// Enter the share name for your USB printer here
 			$connector = null;
-			$connector = new WindowsPrintConnector("rodsoft");
+			$connector = new WindowsPrintConnector("gpseries");
 
 			$printer = new Printer($connector);
 
@@ -44,7 +44,7 @@ class Ticket  {
 				Try to load and print the logo image
 			*/
 			try{
-				$logo = EscposImage::load("logo.png", false);
+				$logo = EscposImage::load("ivan.png", false);
 				$printer->bitImage($logo);
 			}   catch   (Exception $e)  {/*Logger here*/}
 
@@ -77,7 +77,7 @@ class Ticket  {
 			$printer->setTextSize(1, 1);
 			$printer->setEmphasis(true);
 			$printer->text(new item('QTY Producto', '$'));
-			$printer->text("________________________________________________". "\n");
+			$printer->text("________________________________". "\n");
 			$printer->text("". "\n");
 			$printer->setEmphasis(false);
 
@@ -97,7 +97,7 @@ class Ticket  {
 			$printer->setTextSize(1, 1);
 			$printer->setEmphasis(true);
 			$printer->text(new item('QTY Producto', '$'));
-			$printer->text("________________________________________________". "\n");
+			$printer->text("________________________________". "\n");
 			$printer->text("". "\n");
 			$printer->setEmphasis(false);
 			foreach($data["productosCancel"] as $producto) {
@@ -176,19 +176,25 @@ class Ticket  {
 
 
 			$printer->setJustification(Printer::JUSTIFY_CENTER);
-			$printer->setTextSize(2, 2);
+			$printer->setTextSize(2, 1);
 			$printer->setEmphasis(true);
-			$printer->text("__________    __________". "\n");
+			$printer->text("________________". "\n\n");
+			$printer->text("     Entrega    ". "\n");
 			
 			$printer->setEmphasis(false);
 			$printer->setTextSize(1, 1);
 			$printer->feed(1);
 
-			$printer->setJustification(Printer::JUSTIFY_LEFT);
+			$printer->setJustification(Printer::JUSTIFY_CENTER);
+			$printer->setTextSize(2, 1);
 			$printer->setEmphasis(true);
-			$printer->text("       Entrega                   Recibe ". "\n");
+			$printer->text("________________". "\n\n");
+			$printer->text("     Recibe    ". "\n");
+			
 			$printer->setEmphasis(false);
+			$printer->setTextSize(1, 1);
 			$printer->feed(1);
+
 
 			$printer->feed(5);
 			$printer->cut();
@@ -236,7 +242,7 @@ class Item
 	public function __toString()
 	{
 		$rightCols = 10;
-		$leftCols = 38;
+		$leftCols = 20;
 		if ($this -> dollarSign) {
 			$leftCols = $leftCols / 2 - $rightCols / 2;
 		}

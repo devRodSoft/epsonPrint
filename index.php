@@ -33,7 +33,7 @@ class Ticket  {
 		try {
 			// Enter the share name for your USB printer here
 			$connector = null;
-			$connector = new WindowsPrintConnector("rodsoft");
+			$connector = new WindowsPrintConnector("termica");
 
 			$printer = new Printer($connector);
 
@@ -44,7 +44,7 @@ class Ticket  {
 				Try to load and print the logo image
 			*/
 			try{
-				$logo = EscposImage::load("logo.png", false);
+				$logo = EscposImage::load("ivan.png", false);
 				$printer->bitImage($logo);
 			}   catch   (Exception $e)  {/*Logger here*/}
 
@@ -72,7 +72,7 @@ class Ticket  {
 			$printer->setTextSize(1, 1);
 			$printer->setEmphasis(true);
 			$printer->text(new item('QTY Producto', '$'));
-			$printer->text("________________________________________________". "\n");
+			$printer->text("________________________________". "\n");
 			$printer->text("". "\n");
 			$printer->setEmphasis(false);
 
@@ -94,13 +94,13 @@ class Ticket  {
 
 			$printer->setTextSize(1, 1);
 			$printer->setEmphasis(true);
-			$printer->text("________________________________________________". "\n");
+			$printer->text("________________________________". "\n");
 			$printer->text("". "\n");
 			$printer->setEmphasis(false);
 			
-			$printer->setTextSize(2, 1);
-			$printer->text(new ItemCustom("Descuento",  "$ " . $data['descuento'] . ".00"));
-			$printer->text(new ItemCustom("Total",  "$ " . $data['total'] . ".00"));
+			$printer->setTextSize(1, 1);
+			$printer->text(new item("Descuento",  "$ " . $data['descuento'] . ".00"));
+			$printer->text(new item("Total",  "$ " . $data['total'] . ".00"));
 
 			
 			$printer->feed(2);
@@ -108,7 +108,7 @@ class Ticket  {
 			$printer->setTextSize(1, 1);
 			//$printer->text("15 dias de garantia en defectos de fabrica.\n");
 			$printer->text("Gracia por su compra :D.\n");
-			$printer->feed(2);
+			$printer->feed(5);
 
 			//$printer->feed(5);
 			$printer->cut();
@@ -155,7 +155,7 @@ class Item
 	public function __toString()
 	{
 		$rightCols = 10;
-		$leftCols = 38;
+		$leftCols = 20;
 		if ($this -> dollarSign) {
 			$leftCols = $leftCols / 2 - $rightCols / 2;
 		}
@@ -182,8 +182,8 @@ class ItemCustom
 
 	public function __toString()
 	{
-		$rightCols = 10;
-		$leftCols = 14;
+		$rightCols = 2;
+		$leftCols = 10;
 		if ($this -> dollarSign) {
 			$leftCols = $leftCols / 2 - $rightCols / 2;
 		}
