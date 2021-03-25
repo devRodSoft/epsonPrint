@@ -33,7 +33,7 @@ class Ticket  {
 		try {
 			// Enter the share name for your USB printer here
 			$connector = null;
-			$connector = new WindowsPrintConnector("rodsoft");
+			$connector = new WindowsPrintConnector("termica");
 
 			$printer = new Printer($connector);
 
@@ -79,16 +79,12 @@ class Ticket  {
 			
 			if ($data['backendPrint']) {
 				foreach($data["productos"] as $producto) {
-					$printer -> text(new Item($producto['selectedCantidad'] . " " . $producto['descripcion'], ( $producto['precio'] * $producto['selectedCantidad'] )  . ".00"));
+					$printer -> text(new Item($producto['qty'] . " " . $producto['descripcion'], ( $producto['precio'])  . ".00"));
 				}
 			} else {
-				//try to print procducos
-				foreach($data['productos'] as $producto) {	
-					if ($data["precioSelected"] == "1") {
-						$printer -> text(new Item($producto['selectedCantidad'] . " " . $producto['producto']['descripcion'], ( $producto['producto']['precio'] * $producto['selectedCantidad'] )  . ".00"));
-					} else  {
-						$printer -> text(new Item($producto['selectedCantidad'] . " " . $producto['producto']['descripcion'], ( $producto['producto']['precio1'] * $producto['selectedCantidad'] )  . ".00"));
-					}
+				//try to print procducos				
+				foreach($data['productos'] as $producto) {
+					$printer -> text(new Item($producto['qty'] . " " . $producto['producto']['descripcion'], ( $producto['total'] )  . ".00"));					
 				}
 			}
 
